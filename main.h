@@ -1,5 +1,5 @@
-[200~#ifndef _SHELL_H
-#define _SHELL_H
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <string.h>
 #include <stdio.h>
@@ -31,5 +31,6 @@ void (*builtin_handler(char *))(char *);
 void cmd_env(char *);
 void cmd_exit(char *);
 int execute_builtin(char **, char *);
+
 
 #endif
