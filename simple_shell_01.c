@@ -1,94 +1,101 @@
-#include "main.h"
-
-#define BUFFER_SIZE 1024
-
-void display_prompt(void);
-char *read_command(void);
-void execute_command(char *command);
+#include "shell.h"
 
 /**
- * main - Entry point for the simple shell program
- *
+ * _strlen - returns length of a string
+ * @s: takes input
  * Return: Always 0
- */
-int main(void)
+*/
+int _strlen(char *s)
 {
-	char *command;
+	int len;
 
-	while (1)
+	if (s == NULL)
 	{
-		display_prompt();
-		command = read_command();
+		return (0);
+	}
+	for
+		(len = 0;
+		 s[len] != '\0';
+		 len++);
+	return (len);
+}
 
-		if (feof(stdin))
+/**
+ * _putchar - Writes a character to stdout
+ * @c: Character that will be written to stdout
+ * Return: Upon success how many characters were written.
+ */
+
+int _putchar(char c)
+{
+	return (write(1, &c, 1));
+}
+
+/**
+ * _strcmp - compares two strings
+ * @a: First string
+ * @b: Second string
+ * Return: 0 if strings match. -1 Otherwise.
+ */
+
+int _strcmp(char *a, char *b)
+{
+	int _i;
+
+	if (_strlen(a) != _strlen(a))
+	{
+		return (-1);
+	}
+	for (_i = 0; a[_i] != '\0'; _i++)
+	{
+		if (a[_i] != b[_i])
 		{
-			printf("\n");
-			break;
-		}
-
-		execute_command(command);
-		free(command);
-	}
-
-	exit(EXIT_SUCCESS);
-}
-
-/**
- * display_prompt - Displays the shell prompt
- */
-void display_prompt(void)
-{
-	printf("$ ");
-}
-
-/**
- * read_command - Reads a command line from the user
- *
- * Return: The command line entered by the user
- */
-char *read_command(void)
-{
-	char *buffer;
-	size_t bufsize = BUFFER_SIZE;
-
-	buffer = malloc(bufsize * sizeof(char));
-	if (buffer == NULL)
-	{
-		perror("malloc error");
-		exit(EXIT_FAILURE);
-	}
-
-	getline(&buffer, &bufsize, stdin);
-
-	buffer[strcspn(buffer, "\n")] = '\0';
-
-	return (buffer);
-}
-
-/**
- * execute_command - Executes a command
- * @command: The command to execute
- */
-void execute_command(char *command)
-{
-	pid_t pid = fork();
-
-	if (pid < 0)
-	{
-		perror("fork error");
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-
-		if (execve(command, NULL, environ) == -1)
-		{
-			perror("execve error");
-			exit(EXIT_FAILURE);
+			return (-1);
 		}
 	}
-	else
+	return (0);
+}
+/**
+* _strdup - duplicates a string
+* @start: original string
+* Return: copy of string
+*/
+
+char *_strdup(char *start)
+{
+	int index, length;
+	char *end;
+
+	length = _strlen(start);
+	end = malloc(sizeof(char) * (length + 1));
+	for (index = 0; start[index] != '\0'; index++)
 	{
-		wait(NULL);
+		end[index] = start[index];
+	}
+	end[index] = '\0';
+	return (end);
+}
+
+/**
+ * _printstr - Prints a string character by character
+ * @s: String to be printed
+ * @n: if integer is 0 a new line will be printed
+ */
+
+void _printstr(char *s, int n)
+{
+	int ret;
+
+	if (s == NULL)
+	{
+		s = "(null)";
+	}
+	for (ret = 0; s[ret] != '\0'; ret++)
+	{
+		write(STDOUT_FILE NO, &s[ret], 1);
+	}
+	if (n == 0)
+	{
+		write(STDOUT_FILE NO, "\n", 1);
 	}
 }
