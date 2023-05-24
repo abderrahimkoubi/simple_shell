@@ -10,46 +10,38 @@
 *
 * Return: buffer containing command with path on success, or NULL on failure
 */
-char *add_end_path(const char *path, const char *cmd);
 
+char *add_end_path(char *path, char *cmd)
 {
-	char path[100];
-	char cmd[100];
+	char *buffer;
+	size_t a = 0, b = 0;
 
-	printf("Enter path: ");
-	scanf("%99s", path);
+	if (cmd == 0)
+		cmd = "";
 
-	printf("Enter command: ");
-	scanf("%99s", cmd);
+	if (path == 0)
+		path = "";
 
-	char *result = add_end_path(path, cmd);
+	buffer = malloc(sizeof(char) * (_strlen(path) + _strlen(cmd) + 2));
+	if (!buffer)
+		return (NULL);
 
-	if
-		(result != NULL)
-		{
-			printf("Command with path: %s\n", result);
-			free(result);
-		}
-	else
+	while (path[a])
 	{
-		printf("Failed to allocate memory for command with path\n");
+		buffer[a] = path[a];
+		a++;
 	}
 
-	return (0);
-}
-
-char *add_end_path(const char *path, const char *cmd)
-{
-	size_t path_len = strlen(path);
-	size_t cmd_len = strlen(cmd);
-
-	char *buffer = malloc(path_len + cmd_len + 2);
-
-	if
-		(buffer == NULL)
-			return (NULL);
-
-	snprintf(buffer, path_len + cmd_len + 2, "%s/%s", path, cmd);
-
+	if (path[a - 1] != '/')
+	{
+		buffer[a] = '/';
+		a++;
+	}
+	while (cmd[b])
+	{
+		buffer[a + b] = cmd[b];
+		b++;
+	}
+	buffer[a + b] = '\0';
 	return (buffer);
 }
