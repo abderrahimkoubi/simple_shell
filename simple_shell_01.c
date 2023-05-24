@@ -3,45 +3,75 @@
 #include <string.h>
 #include "shell.h"
 
+#define MAX_COMMAND_LENGTH 100
 /**
-* add_end_path - adds path to cmd
-* @path: path of a written cmd
-* @cmd:  an entered cmd
-*
-* Return: buffer containing command with path on success, or NULL on failure
-*/
+ * execute_command - Execute the user-entered command
+ * @command: User command to execute
+ *
+ * Return: void
+ */
+void execute_command(const char *command);
 
-char *add_end_path(char *path, char *cmd)
 {
-	char *buffer;
-	size_t a = 0, b = 0;
+	char command[MAX_COMMAND_LENGTH];
 
-	if (cmd == 0)
-		cmd = "";
-
-	if (path == 0)
-		path = "";
-
-	buffer = malloc(sizeof(char) * (_strlen(path) + _strlen(cmd) + 2));
-	if (!buffer)
-		return (NULL);
-
-	while (path[a])
+	while (1)
 	{
-		buffer[a] = path[a];
-		a++;
+		putchar('s');
+		putchar('i');
+		putchar('m');
+		putchar('p');
+		putchar('l');
+		putchar('e');
+		putchar('_');
+		putchar('s');
+		putchar('h');
+		putchar('e');
+		putchar('l');
+		putchar('l');
+		putchar('$');
+		putchar(' ');
+
+		if
+			(fgets(command, sizeof(command), stdin) == NULL)
+			{
+				putchar('\n');
+				break;
+			}
+
+		command[strcspn(command, "\n")] = '\0';
+
+		execute_command(command);
 	}
 
-	if (path[a - 1] != '/')
-	{
-		buffer[a] = '/';
-		a++;
-	}
-	while (cmd[b])
-	{
-		buffer[a + b] = cmd[b];
-		b++;
-	}
-	buffer[a + b] = '\0';
-	return (buffer);
+	return (0);
+}
+
+void execute_command(const char *command)
+{
+	pid_t pid = fork();
+
+	if
+		(pid < 0)
+		{
+			perror("fork");
+			exit(EXIT_FAILURE);
+		}
+	else
+		if
+			(pid == 0)
+			{
+
+				if
+					(execlp(command, command, NULL) == -1)
+					{
+						perror("Command not found");
+						exit(EXIT_FAILURE);
+					}
+			}
+		else
+		{
+
+			wait(NULL);
+		}
 }

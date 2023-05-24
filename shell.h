@@ -1,6 +1,6 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-char *add_end_path(const char *path, const char *cmd);
+void execute_command(const char *command);
 
 #endif /* SHELL_H */
