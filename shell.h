@@ -10,5 +10,9 @@
 #include <sys/wait.h>
 #include <stdbool.h>
 
+void _env(char **env);
+void execute_process(pid_t *pid, char *argv[], char *name);
+int env_cmd(char *cmd);
+int exit_cmd(char *cmd);
 
 #endif /* SHELL_H */
