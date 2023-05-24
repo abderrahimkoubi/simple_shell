@@ -1,86 +1,48 @@
 #include "shell.h"
 /**
- * main - Entry point
- * Description: prompts user for input and displays output
- * @argc: arguments count
- * @argv: arguments string vector
- * Return: 0 (Success)
+ * prompt - function serves as the main loop for the command line interpreter
+ *@ax: an array of strings representing the command-line arguments
+ *@envi: represents the environment variables
  */
-int main(int argc, char *argv[])
+
+void prompt(char **ax, char **envi)
 {
-	char *buff = NULL;
-	char *prompt = "simpsh$ ";
-	ssize_t inputsize;
-	size_t cmdsize = 0;
-	const char *separator = " \n";
-	int i;
+	char *str = NULL;
+	int j, stats;
+	size_t n = 0;
+	char *argv[] = {NULL, NULL};
+	ssize_t number_char;
 	pid_t pid;
-	int is_redir = !isatty(STDIN_FILENO);
-	char **exec_argv;
-	(void) argc, (void) argv;
-	exec_argv = malloc(sizeof(char *) * 256);
-	if
-		(exec_argv == NULL)
-		{
-			perror("Memory allocation failed");
-			return (-1);
-		}
+
 	while (1)
 	{
-		if
-			(!is_redir && isatty(STDOUT_FILENO))
-			{
-				write(STDIN_FILENO, prompt, strlen(prompt));
-			}
-		inputsize = getline(&buff, &cmdsize, stdin);
+		printf("cisfun$ ");
+
+		number_char = getline(&str, &n, stdin);
+		if (number_char == -1)
 		{
-			if
-				(!is_redir && isatty(STDOUT_FILENO))
-				{
-					if
-						(inputsize == -1)
-						{
-							printf("\n");
-							return (-1);
-						}
-				}
+			free(str);
+			exit(EXIT_FAILURE);
 		}
-		if
-			(inputsize <= 1)
-			{
-				continue;
-			}
-		inputsize = strlen(buff);
-		if
-			(buff[inputsize - 1] == '\n')
-			{
-				buff[inputsize - 1] = '\0';
-			}
-		str_tokens(buff, separator, exec_argv);
-		pid = fork();
-		if
-			(pid == -1)
+		while (str[j])
 		{
-			perror("Fork failed");
-			return (-1);
+			if (str[j] == '\n')
+				str[j] = 0;
+			j++;
+		}
+		pid = fork();
+		argv[0] = str;
+		if (pid == -1)
+		{
+			free(str);
+			exit(EXIT_FAILURE);
+		}
+		if (pid == 0)
+		{
+			if (execve(argv[0], argv, envi) == -1)
+				printf("%s: No such file or directory\n", ax[0]);
 		}
 		else
-			if
-				(pid == 0)
-				{
-					exe_cmd(exec_argv);
-					return (-1);
-				}
-			else
-			{
-				wait(NULL);
-			}
-		for (i = 0; exec_argv[i] != NULL; i++)
-		{
-			free(exec_argv[i]);
-		}
+			wait(&stats);
 	}
-	free(buff);
-	free(exec_argv);
-	return (0);
 }

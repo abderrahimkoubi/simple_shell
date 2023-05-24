@@ -10,7 +10,6 @@
 #include <sys/wait.h>
 #include <stdbool.h>
 
-void exe_cmd(char **argv);
-int str_tokens(char *buff, const char *separator, char **exec_argv);
+void prompt(char **ax, char **envi);
 
 #endif /* SHELL_H */
