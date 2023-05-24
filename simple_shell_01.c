@@ -1,82 +1,86 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "shell.h"
-
-#define MAX_COMMAND_LENGTH 100
 /**
- * execute_command - Execute the user-entered command
- * @command: User command to execute
- *
- * Return: void
+ * main - Entry point
+ * Description: prompts user for input and displays output
+ * @argc: arguments count
+ * @argv: arguments string vector
+ * Return: 0 (Success)
  */
-void execute_command(const char *command);
-/**
- * main - entry point
- *
- * Return : 0
- */
-int main ( )
+int main(int argc, char *argv[])
 {
-	char command[MAX_COMMAND_LENGTH];
-
+	char *buff = NULL;
+	char *prompt = "simpsh$ ";
+	ssize_t inputsize;
+	size_t cmdsize = 0;
+	const char *separator = " \n";
+	int i;
+	pid_t pid;
+	int is_redir = !isatty(STDIN_FILENO);
+	char **exec_argv;
+	(void) argc, (void) argv;
+	exec_argv = malloc(sizeof(char *) * 256);
+	if
+		(exec_argv == NULL)
+		{
+			perror("Memory allocation failed");
+			return (-1);
+		}
 	while (1)
 	{
-		putchar('s');
-		putchar('i');
-		putchar('m');
-		putchar('p');
-		putchar('l');
-		putchar('e');
-		putchar('_');
-		putchar('s');
-		putchar('h');
-		putchar('e');
-		putchar('l');
-		putchar('l');
-		putchar('$');
-		putchar(' ');
-
 		if
-			(fgets(command, sizeof(command), stdin) == NULL)
+			(!is_redir && isatty(STDOUT_FILENO))
 			{
-				putchar('\n');
-				break;
+				write(STDIN_FILENO, prompt, strlen(prompt));
 			}
-
-		command[strcspn(command, "\n")] = '\0';
-
-		execute_command(command);
+		inputsize = getline(&buff, &cmdsize, stdin);
+		{
+			if
+				(!is_redir && isatty(STDOUT_FILENO))
+				{
+					if
+						(inputsize == -1)
+						{
+							printf("\n");
+							return (-1);
+						}
+				}
+		}
+		if
+			(inputsize <= 1)
+			{
+				continue;
+			}
+		inputsize = strlen(buff);
+		if
+			(buff[inputsize - 1] == '\n')
+			{
+				buff[inputsize - 1] = '\0';
+			}
+		str_tokens(buff, separator, exec_argv);
+		pid = fork();
+		if
+			(pid == -1)
+		{
+			perror("Fork failed");
+			return (-1);
+		}
+		else
+			if
+				(pid == 0)
+				{
+					exe_cmd(exec_argv);
+					return (-1);
+				}
+			else
+			{
+				wait(NULL);
+			}
+		for (i = 0; exec_argv[i] != NULL; i++)
+		{
+			free(exec_argv[i]);
+		}
 	}
-
+	free(buff);
+	free(exec_argv);
 	return (0);
 }
-
-void execute_command(const char *command)
-{
-	pid_t pid = fork();
-
-	if
-		(pid < 0)
-		{
-			perror("fork");
-			exit(EXIT_FAILURE);
-		}
-	else
-		if
-			(pid == 0)
-			{
-
-				if
-					(execlp(command, command, NULL) == -1)
-					{
-						perror("Command not found");
-						exit(EXIT_FAILURE);
-					}
-			}
-		else
-		{
-
-			wait(NULL);
-		}
-}	
