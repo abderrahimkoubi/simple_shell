@@ -10,6 +10,5 @@
 #include <sys/wait.h>
 #include <stdbool.h>
 
-void prompt(char **ax, char **envi);
 
 #endif /* SHELL_H */

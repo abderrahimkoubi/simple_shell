@@ -1,55 +1,41 @@
 #include "shell.h"
+
 /**
- * prompt - function serves as the main loop for the command line interpreter
- *@ax: an array of strings representing the command-line arguments
- *@envi: represents the environment variables
+ * main -shell
  *
- * Return: 0
+ * Return: 0 Success
  */
 
-void prompt(char **ax, char **envi)
+int main(void)
 {
-	char input[1024];
-	pid_t pid;
-	int status;
+	char *input = NULL, *prompt = "$ ", *cmd[50];
+	size_t len = 0;
+	ssize_t nread = 0;
 
-	while (1)
-	{
-		printf("simple_shell$ ");
-
-		if
-			(fgets(input, sizeof(input), stdin) == NULL)
-			{
-				printf("\n");
-				break;
-			}
-		input[strcspn(input, "\n")] = '\0';
-		pid = fork();
-		if
-			(pid < 0)
-	}
-	perror("fork");
-	exit(EXIT_FAILURE);
-}
-else
-if
-(pid == 0)
-{
-	if
-		(execlp(input, input, NULL) == -1)
+	do {
+		write(STDOUT_FILENO, prompt, strlen(prompt));
+		nread = getline(&input, &len, stdin);
+		if (!nread)
+			return (-1);
+		if (input[0] == '\n')
 		{
-			perror("execlp");
-			exit(EXIT_FAILURE);
+			free(input);
+			continue;
 		}
-	exit(EXIT_SUCCESS);
-}
-else
-{
-	waitpid(pid, &status, 0);
-}
-int main(int argc, char *argv[])
-{
-	char *envi[] = {NULL};
-	prompt(argv, envi);
+		if (strcmp(input, "exit\n") == 0)
+		{
+			free(input);
+			exit(EXIT_SUCCESS);
+		}
+		if (strcmp(input, "env") == 0)
+		{
+			print_env(env);
+			continue;
+		}
+		free(input);
+		input = NULL;
+		len = 0;
+	} while (1);
+
 	return (0);
 }
