@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 /**
- * main - find the result of the calculation
+ * main - how to caalcute the result
  *
  * Return: Always 0 (Success)
  */
