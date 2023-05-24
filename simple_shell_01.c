@@ -3,46 +3,53 @@
  * prompt - function serves as the main loop for the command line interpreter
  *@ax: an array of strings representing the command-line arguments
  *@envi: represents the environment variables
+ *
+ * Return: 0
  */
 
 void prompt(char **ax, char **envi)
 {
-	char *str = NULL;
-	int j, stats;
-	size_t n = 0;
-	char *argv[] = {NULL, NULL};
-	ssize_t number_char;
+	char input[1024];
 	pid_t pid;
+	int status;
 
 	while (1)
 	{
-		printf("cisfun$ ");
+		printf("simple_shell$ ");
 
-		number_char = getline(&str, &n, stdin);
-		if (number_char == -1)
-		{
-			free(str);
-			exit(EXIT_FAILURE);
-		}
-		while (str[j])
-		{
-			if (str[j] == '\n')
-				str[j] = 0;
-			j++;
-		}
+		if
+			(fgets(input, sizeof(input), stdin) == NULL)
+			{
+				printf("\n");
+				break;
+			}
+		input[strcspn(input, "\n")] = '\0';
 		pid = fork();
-		argv[0] = str;
-		if (pid == -1)
+		if
+			(pid < 0)
+	}
+	perror("fork");
+	exit(EXIT_FAILURE);
+}
+else
+if
+(pid == 0)
+{
+	if
+		(execlp(input, input, NULL) == -1)
 		{
-			free(str);
+			perror("execlp");
 			exit(EXIT_FAILURE);
 		}
-		if (pid == 0)
-		{
-			if (execve(argv[0], argv, envi) == -1)
-				printf("%s: No such file or directory\n", ax[0]);
-		}
-		else
-			wait(&stats);
-	}
+	exit(EXIT_SUCCESS);
+}
+else
+{
+	waitpid(pid, &status, 0);
+}
+int main(int argc, char *argv[])
+{
+	char *envi[] = {NULL};
+	prompt(argv, envi);
+	return (0);
 }
