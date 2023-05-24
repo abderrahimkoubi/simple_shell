@@ -1,106 +1,79 @@
-#include "main.h"
+#include "shell.h"
 
 /**
- * execute_builtin - Check if it is a built-in command and then execute it.
- * @data: Data structure input.
- * Return: 1 if it is a built-in command, 0 if not.
+ * _strlen - Returns the length of a string.
+ * @s: The string to calculate the length of.
+ *
+ * Return: The length of the string.
  */
-int execute_builtin(data *data)
+int _strlen(char *s)
 {
-	builtin builtins[] = {
-		{"exit_shell", exit_builtin},
-		{"show_env", env_builtin},
-		{"set_env", setenv_builtin},
-		{"unset_env", unsetenv_builtin},
-		{"change_dir", cd_builtin},
-		{NULL, NULL},
-	};
-	int index = 0;
+	int len = 0;
 
-	for (index = 0; builtins[index].cmd; index++)
-	{
-		if (_strcmp(data->arguments[0], builtins[index].cmd) == 0)
-		{
-			builtins[index].func(data);
-			return (1);
-		}
-	}
-	return (0);
+	if (!s)
+		return (0);
+
+	while (s[len])
+		len++;
+
+	return (len);
 }
 
 /**
- * exit_builtin - Exit the shell.
- * @data: Data structure input.
- * Return: void
+ * _strcmp - Performs lexicographic comparison of two strings.
+ * @s1: The first string to compare.
+ * @s2: The second string to compare.
+ *
+ * Return: Negative if s1 < s2, positive if s1 > s2, 0 if s1 == s2.
  */
-void exit_builtin(data *data)
+int _strcmp(char *s1, char *s2)
 {
-	if (data->arguments[1] && _is_number(data->arguments[1]))
-		data->exit_status = atoi(data->arguments[1]);
-	free_array(data->arguments);
-	free(data->command);
-	if (data->flag_setenv)
-		free_array(environ);
-	exit(data->exit_status);
+	while (*s1 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+	}
+
+	return (*(unsigned char *)s1 - *(unsigned char *)s2);
 }
 
 /**
- * env_builtin - Print the current environment.
- * @data: Data structure input.
- * Return: void
+ * starts_with - Checks if a string starts with a given substring.
+ * @haystack: The string to search in.
+ * @needle: The substring to find.
+ *
+ * Return: Address of the next character after the substring if found,
+ *         NULL otherwise.
  */
-void env_builtin(data *data)
+char *starts_with(const char *haystack, const char *needle)
 {
-	int i = 0;
-
-	(void)data;
-	while (environ[i])
+	while (*needle)
 	{
-		_printf(environ[i]);
-		_printf("\n");
-		i++;
+		if (*haystack != *needle)
+			return (NULL);
+		haystack++;
+		needle++;
 	}
+
+	return ((char *)haystack);
 }
 
 /**
- * setenv_builtin - Initialize a new environment var
- * or modify the existing one.
- * @data: Data structure input.
- * Return: void
+ * _strcat - Concatenates two strings.
+ * @dest: The destination string.
+ * @src: The source string.
+ *
+ * Return: Pointer to the destination string.
  */
-void setenv_builtin(data *data)
+char *_strcat(char *dest, char *src)
 {
-	(void)data;
-	if (data->arguments[1] && data->arguments[2])
-	{
-		if (_setenv(data, data->arguments[1], data->arguments[2]) == -1)
-		{
-			perror("setenv");
-		}
-	}
-}
+	char *ret = dest;
 
-/**
- * unsetenv_builtin - Remove an environment variable.
- * @data: Data structure input.
- * Return: void
- */
-void unsetenv_builtin(data *data)
-{
-	int i, j;
-	int len;
+	while (*dest)
+		dest++;
 
-	(void)data;
-	if (!data->arguments[1] || !getenv(data->arguments[1]))
-	{
-		_perror(data->shell_name, "variable not found.");
-		return;
-	}
-	len = strlen(data->arguments[1]);
-	for (i = 0; environ[i]; i++)
-		if
-			(strncmp(environ[i], data->arguments[1], len) == 0
-			 && environ[i][len] == '=')
-			for (j = i; environ[j]; j++)
-				environ[j] = environ[j + 1];
+	while ((*dest++ = *src++))
+		;
+
+	return (ret);
 }
