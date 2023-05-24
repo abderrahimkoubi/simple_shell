@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "shell.h"
+
 /**
 * add_end_path - adds path to cmd
 * @path: path of a written cmd
