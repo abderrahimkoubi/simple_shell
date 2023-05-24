@@ -1,26 +1,108 @@
-#include "shell.h"
+#include "header.h"
 
 /**
- * _exec_path - finds the path of a command and executes it.
- * @tmp_path: path to the command
- * @tmp_args: array of cmd and args
- * @env: env variables
- * Return: Nothing
-*/
+ * _putchar - writhes the character to stdout
+ * @c: the character passed
+ * Return: returns 1 or -1 on failure
+ */
 
-void _exec_path(char *tmp_path, char **tmp_args, char **env)
+int _putchar(char c)
 {
-	int status;
-	pid_t childPid;
+	return (write(1, &c, 1));
+}
 
-	childPid = fork();
-	if (childPid == 0)
+/**
+ * _puts - prints a string
+ * @str: the pointer to the string
+ * Return: void
+ */
+
+void _puts(char *str)
+{
+	int g;
+
+	for (g = 0; str[g] != '\0'; g++)
 	{
-		tmp_args[0] = strdup(tmp_path);
-		execve(tmp_args[0], tmp_args, env);
+		_putchar(str[g]);
 	}
-	else
+	_putchar('\n');
+}
+
+/**
+ * _strlen - checks the length of string
+ * @s: length checker
+ * Return: the length
+ */
+
+int _strlen(const char *s)
+{
+	int i;
+
+	i = 0;
+	while (s[i] != '\0')
 	{
-	wait(&status);
+		i++;
 	}
+	return ((i + 1));
+}
+
+/**
+ * str_concat - back a pointer to array
+ * @string1: first array
+ * @string2: second array
+ * Return: returns an array
+ */
+char *str_concat(char *string1, char *string2)
+{
+	char *destination;
+	unsigned int i;
+	unsigned int k;
+	unsigned int size;
+
+	if (string1 == NULL)
+		string1 = "";
+
+	if (string2 == NULL)
+		string2 = "";
+
+	size = (_strlen(string1) + _strlen(string2) + 1);
+
+	destination = (char *) malloc(size * sizeof(char));
+
+	if (destination == 0)
+	{
+		return (NULL);
+	}
+
+	for (i = 0; *(string1 + i) != '\0'; i++)
+		*(destination + i) = *(string1 + i);
+
+	for (k = 0; *(string2 + k)  != '\0'; k++)
+	{
+		*(destination + i) = *(string2 + k);
+		i++;
+	}
+	destination[i] = '\0';
+	return (destination);
+}
+
+/**
+ * _strcmp - compare a set of strings
+ * @string1: first string
+ * @string2: second string
+ * Return: returns the number that is comparative
+ * to whether the strings are null and
+ * how the two strings compare
+ */
+int _strcmp(char *string1, char *string2)
+{
+	char *pointer1 = string1;
+	char *pointer2 = string2;
+
+	while (*pointer1 != '\0' && *pointer2 != '\0' && *pointer1 == *pointer2)
+	{
+		pointer1++;
+		pointer2++;
+	}
+	return (*pointer1 - *pointer2);
 }
