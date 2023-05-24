@@ -1,108 +1,190 @@
-#include "header.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include "shell.h"
 
+#define TOKEN_BUF_SIZE 64
+#define TOKEN_DELIM " \t\r\n\a"
+
+void start_prompt(void);
+char *read_command(void);
+char **get_array_from_str(char *str, char **env);
+char **_which(char *foundpath);
+int executable_command(char **av, char **args, char **env,
+		int status_main, int count);
 /**
- * _putchar - writhes the character to stdout
- * @c: the character passed
- * Return: returns 1 or -1 on failure
+ * main - Entry point for the shell program
+ *
+ * Return: Always 0
  */
-
-int _putchar(char c)
+int main(void)
 {
-	return (write(1, &c, 1));
+	char *command;
+	char **args;
+	char **env = environ;
+
+	while (1)
+	{
+		start_prompt();
+		command = read_command();
+		args = get_array_from_str(command, env);
+		if (args != NULL)
+		{
+			executable_command(args, args, env, 0, 0);
+		}
+		free(command);
+		free(args);
+	}
+
+	return (0);
 }
 
 /**
- * _puts - prints a string
- * @str: the pointer to the string
- * Return: void
+ * start_prompt - Displays the shell prompt
  */
-
-void _puts(char *str)
+void start_prompt(void)
 {
-	int g;
+	char *prompt = "#myShell$ ";
 
-	for (g = 0; str[g] != '\0'; g++)
+	if (isatty(STDIN_FILENO))
 	{
-		_putchar(str[g]);
+		write(STDOUT_FILENO, prompt, strlen(prompt));
 	}
-	_putchar('\n');
 }
 
 /**
- * _strlen - checks the length of string
- * @s: length checker
- * Return: the length
+ * read_command - Reads the user input command
+ * Return: The command string
  */
-
-int _strlen(const char *s)
+char *read_command(void)
 {
-	int i;
+	char *entry = NULL;
+	size_t bufsize = 0;
+	ssize_t signal;
 
-	i = 0;
-	while (s[i] != '\0')
+	signal = getline(&entry, &bufsize, stdin);
+	if (signal == -1)
 	{
-		i++;
+		if (isatty(STDIN_FILENO))
+		{
+			write(STDOUT_FILENO, "\n", 1);
+		}
+		free(entry);
+		exit(0);
 	}
-	return ((i + 1));
+
+	return (entry);
 }
 
 /**
- * str_concat - back a pointer to array
- * @string1: first array
- * @string2: second array
- * Return: returns an array
+ * get_array_from_str - Converts the command string to an array of arguments
+ * @str: The command string
+ * @env: The environment variables array
+ * Return: The array of arguments
  */
-char *str_concat(char *string1, char *string2)
+char **get_array_from_str(char *str, char **env)
 {
-	char *destination;
-	unsigned int i;
-	unsigned int k;
-	unsigned int size;
+	int bufsize = TOKEN_BUF_SIZE;
+	int position = 0;
+	char **tokens = malloc(bufsize * sizeof(char *));
+	char *token;
 
-	if (string1 == NULL)
-		string1 = "";
-
-	if (string2 == NULL)
-		string2 = "";
-
-	size = (_strlen(string1) + _strlen(string2) + 1);
-
-	destination = (char *) malloc(size * sizeof(char));
-
-	if (destination == 0)
+	if (!tokens)
 	{
-		return (NULL);
+		perror("Error");
+		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; *(string1 + i) != '\0'; i++)
-		*(destination + i) = *(string1 + i);
-
-	for (k = 0; *(string2 + k)  != '\0'; k++)
+	token = strtok(str, TOKEN_DELIM);
+	while (token != NULL)
 	{
-		*(destination + i) = *(string2 + k);
-		i++;
+		tokens[position] = token;
+		position++;
+
+		token = strtok(NULL, TOKEN_DELIM);
 	}
-	destination[i] = '\0';
-	return (destination);
+	tokens[position] = NULL;
+
+	return (tokens);
 }
 
 /**
- * _strcmp - compare a set of strings
- * @string1: first string
- * @string2: second string
- * Return: returns the number that is comparative
- * to whether the strings are null and
- * how the two strings compare
+ * _which - Searches for the executable in the directories
+ * @foundpath: The value of the PATH environment variable
+ * Return: The array of directories
  */
-int _strcmp(char *string1, char *string2)
+char **_which(char *foundpath)
 {
-	char *pointer1 = string1;
-	char *pointer2 = string2;
+	int bufsize = TOKEN_BUF_SIZE;
+	int position = 0;
+	char **directories = malloc(bufsize * sizeof(char *));
+	char *copy_path = strdup(foundpath);
+	char *token;
 
-	while (*pointer1 != '\0' && *pointer2 != '\0' && *pointer1 == *pointer2)
+	if (!directories)
 	{
-		pointer1++;
-		pointer2++;
+		perror("Error");
+		exit(EXIT_FAILURE);
 	}
-	return (*pointer1 - *pointer2);
+
+	token = strtok(copy_path, ":");
+	while (token != NULL)
+	{
+		directories[position] = token;
+		position++;
+
+		token = strtok(NULL, ":");
+	}
+	directories[position] = NULL;
+
+	free(copy_path);
+	return (directories);
+}
+
+/**
+ * executable_command - Executes the command
+ * @av: The array of arguments
+ * @args: The array of arguments
+ * @env: The environment variables array
+ * @status_main: The status flag
+ * @count: The command count
+ * Return: 1 on success
+ */
+int executable_command(char **av, char **args, char **env,
+		int status_main, int count)
+{
+	pid_t pid;
+	int status;
+
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("./hsh: ");
+		exit(1);
+	}
+	else if (pid == 0)
+	{
+		if (execve(args[0], args, env) == -1)
+		{
+			perror("Error");
+			free(args);
+			exit(1);
+		}
+		exit(0);
+	}
+	else
+	{
+		if (status_main == 1)
+		{
+			free(args[0]);
+		}
+
+		free(args);
+		waitpid(pid, &status, WUNTRACED);
+	}
+
+	return (1);
 }
