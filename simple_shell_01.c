@@ -11,7 +11,12 @@
  * Return: void
  */
 void execute_command(const char *command);
-
+/**
+ * main - entry point
+ *
+ * Return : 0
+ */
+int main ( )
 {
 	char command[MAX_COMMAND_LENGTH];
 
@@ -74,4 +79,4 @@ void execute_command(const char *command)
 
 			wait(NULL);
 		}
-}
+}	
