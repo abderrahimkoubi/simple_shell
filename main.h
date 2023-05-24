@@ -11,10 +11,11 @@
 #include <dirent.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-int execute_builtin(data *data)
-void exit_builtin(data *data)
-void env_builtin(data *data)
-void setenv_builtin(data *data)
-void unsetenv_builtin(data *data)
+
+int execute_builtin(data *data;);
+void exit_builtin(data *data);
+void env_builtin(data *data);
+void setenv_builtin(data *data);
+void unsetenv_builtin(data *data);
 
 #endif
