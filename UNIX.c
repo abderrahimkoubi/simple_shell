@@ -1,98 +1,129 @@
 #include "shell.h"
 
 /**
- * lookforslash - identifies if first char is a slash.
- * @cmd: first string
+ * _strlen - gets string length
+ * @s: string parameter
+ * Return: string length
  *
- * Return: 1 if yes 0 if no.
  */
-int lookforslash(char *cmd)
-{
-	int read = 0;
 
-	while (cmd[read])
+int _strlen(const char *s)
+{
+	int len;
+
+	len = 0;
+	while (*s != '\0')
 	{
-		if (cmd[0] == '/')
+		len++;
+		s++;
+	}
+	return (len);
+}
+
+/**
+ * _strcpy -Function copies the string pointed to by src
+ * @dest: destination
+ * @src: source
+ * Return: the pointer to dest
+ */
+
+char *_strcpy(char *dest, const char *src)
+{
+	int len = 0;
+
+	while (*(src + len) != '\0')
+	{
+		*(dest + len) = *(src + len);
+		len++;
+	}
+	*(dest + len) = '\0';
+	return (dest);
+}
+
+/**
+ *_strcat - concatenate two strings
+ * @dest: Parameter destination
+ * @src: parameter source
+ *
+ * Return: Destination pointer
+ */
+char *_strcat(char *dest, const char *src)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (dest[i] != '\0')
+	{
+		i++;
+	}
+	j = 0;
+	while (src[j] != '\0')
+	{
+		dest[i] = src[j];
+		j++;
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
+/**
+ * _strcmp - Function compares two string values
+ * @s1: First string input
+ * @s2: Second string input
+ * Return: The differenc between string 1 and 2
+ */
+
+int _strcmp(const char *s1, const char *s2)
+{
+	int i;
+
+	i = 0;
+	while (s1[i] != '\0' && s2[i] != '\0')
+	{
+		if (s1[i] != s2[i])
 		{
-			printf("%c\n", cmd[0]);
-			return (1);
+			return (s1[i] - s2[i]);
 		}
-		read++;
+		i++;
 	}
 	return (0);
 }
 
 /**
- * compareExit - identifies if first char is a slash.
- * @z1: first string
- * @z2: exit string
- * Return: 1 if yes 0 if no.
- */
-int compareExit(char *z1, char *z2)
-{
-	int j = 0;
-
-	for (; (*z2 != '\0' && *z1 != '\0') && *z1 == *z2; z1++)
-	{
-		if (j == 3)
-			break;
-		j++;
-		z2++;
-	}
-	return (*z1 - *z2);
-}
-
-/**
- * compareEnv - identifies if first char is a slash.
- * @z1: first string
- * @z2: exit string
+ * _strdup - Returns a pointer which contains a copy of a given string.
+ * @str: The string input.
  *
- * Return: 1 if yes 0 if no.
+ * Return: Pointer to duplicated string or null if memory insufficient.
  */
-int compareEnv(char *z1, char *z2)
-{
-	int j = 0;
 
-	for (; (*z2 != '\0' && *z1 != '\0') && *z1 == *z2; z1++)
+char *_strdup(const char *str)
+{
+	int count = 0;
+	int i;
+	char *s;
+
+	if (str == NULL)
 	{
-		if (j == 2)
-			break;
-		j++;
-		z2++;
+		return (NULL);
 	}
-	return (*z1 - *z2);
-}
 
-/**
- * identify_string - identify keyboard iput.
- * @parameter: call prompt from another function (prompt)
- * Return: str
- */
-char **identify_string(char *parameter)
-{
-	char **buf = malloc(1024 * sizeof(char *));
-	char *split;
-	int j = 0;
-	char *delem = " \t\n";
-
-	split = strtok(parameter, delem);
-
-	while (split != NULL)
+	while (str[count] != '\0')
 	{
-		buf[j] = split;
-		j++;
-		split = strtok(NULL, delem);
+		count++;
 	}
-	execute_proc(buf);
-	return (buf);
-}
 
-/**
- * controlC - avoid close the shell
- * @sig: keep going shell
- */
-void controlC(int sig)
-{
-	(void) sig;
-	write(1, "\n$ ", 3);
+	s = (char *)malloc(count * sizeof(char) + 1);
+
+	if (s == NULL)
+	{
+		free(s);
+		return (NULL);
+	}
+	for (i = 0; i < count; i++)
+	{
+		s[i] = str[i];
+	}
+	return (s);
 }

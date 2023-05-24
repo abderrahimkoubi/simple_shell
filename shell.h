@@ -1,33 +1,33 @@
-#ifndef _SHELL_H_
-#define _SHELL_H_
-#include <sys/wait.h>
-#include <sys/types.h>
+#ifndef SHELL_H 
+#define SHELL_H
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <unistd.h>
-#include <dirent.h>
-#include <limits.h>
-#define MAX_VALUE 99
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <stdbool.h>
 
+int main(int ac, char **argv);
+void free_argv(char **argv);
+char **parse_command(char *command, ssize_t num_chars);
+char **tokenizePath();
+char *getenv(const char *name);
+char *actual_path(char *command);
+char *findCommandPath(char **pathTokens,  char *command);
+void freeTokenizedPath(char **pathTokens);
+char *getCommandPath(char *command);
+void execute_external_command(char *command, char **argv);
 extern char **environ;
-char *show_input(void);
-void prompt(void);
-char *_strcat(char *src);
-int _strlen(char *str);
-void place(char *str);
-char *findfile(char *command);
-char *find_command(char *command);
-int compare(char *z, char *z2);
-int _strcmpdir(char *z1, char *z2);
-int charput(char c);
-void place(char *str);
-char *str_concat(char *z1, char *z2);
-int lookforslash(char *cmd);
-int compareExit(char *z1, char *z2);
-int compareEnv(char *z1, char *z2);
-void execute_proc(char **cmd);
-char **identify_string(char *parameter);
-void controlC(int sig);
+char *_strdup(const char *str);
+int _strcmp(const char *s1, const char *s2);
+char *_strcat(char *dest, const char *src);
+char *_strcpy(char *dest, const char *src);
+int _strlen(const char *s);
+int _strncmp(const char *s1, const char *s2, size_t n);
+
+
 #endif
